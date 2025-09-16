@@ -1,15 +1,15 @@
 package com.innova.restaurant.repository.jpa;
 
-import com.innova.restaurant.model.entity.Restaurant;
-import com.innova.restaurant.model.entity.User;
+import java.time.LocalTime;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
+import com.innova.restaurant.model.entity.Restaurant;
+import com.innova.restaurant.model.entity.User;
 
 /**
  * Repositorio JPA para la entidad Restaurant

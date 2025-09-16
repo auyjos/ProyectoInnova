@@ -1,13 +1,14 @@
 package com.innova.restaurant.repository.mongo;
 
-import com.innova.restaurant.model.document.UserDocument;
-import com.innova.restaurant.model.enums.UserRole;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.innova.restaurant.model.document.UserDocument;
+import com.innova.restaurant.model.enums.UserRole;
 
 /**
  * Repositorio MongoDB para UserDocument
@@ -33,12 +34,12 @@ public interface UserDocumentRepository extends MongoRepository<UserDocument, St
 
     /**
      * Busca un usuario por email o nombre de usuario
+     * Método derivado automático - Spring Data MongoDB genera la query
      *
      * @param email el email del usuario
      * @param username el nombre de usuario
      * @return Optional con el usuario encontrado
      */
-    @Query("{ $or: [ { 'email': ?0 }, { 'username': ?1 } ] }")
     Optional<UserDocument> findByEmailOrUsername(String email, String username);
 
     /**
@@ -91,14 +92,21 @@ public interface UserDocumentRepository extends MongoRepository<UserDocument, St
     long countByRole(UserRole role);
 
     /**
-     * Busca usuarios por nombre o apellido usando regex
-     *
-     * @param searchTerm término de búsqueda
-     * @return lista de usuarios que coinciden con la búsqueda
+     * Busca usuarios por nombre que contiene el término (ignora mayúsculas/minúsculas)
+     * Método derivado automático - Spring Data MongoDB genera la query
      */
-    @Query("{ $or: [ " +
-           "{ 'firstName': { $regex: ?0, $options: 'i' } }, " +
-           "{ 'lastName': { $regex: ?0, $options: 'i' } } " +
-           "] }")
-    List<UserDocument> findByNameContaining(String searchTerm);
+    List<UserDocument> findByFirstNameContainingIgnoreCase(String firstName);
+    
+    /**
+     * Busca usuarios por apellido que contiene el término (ignora mayúsculas/minúsculas)
+     * Método derivado automático - Spring Data MongoDB genera la query
+     */
+    List<UserDocument> findByLastNameContainingIgnoreCase(String lastName);
+    
+    /**
+     * Busca usuarios por nombre O apellido que contiene el término
+     * Método derivado automático - Spring Data MongoDB genera la query
+     */
+    List<UserDocument> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
+        String firstName, String lastName);
 }

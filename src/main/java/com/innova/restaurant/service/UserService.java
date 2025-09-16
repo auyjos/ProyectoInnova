@@ -1,12 +1,12 @@
 package com.innova.restaurant.service;
 
-import com.innova.restaurant.dto.UserDto;
-import com.innova.restaurant.dto.CreateUserDto;
-import com.innova.restaurant.dto.UpdateUserDto;
-import com.innova.restaurant.model.enums.UserRole;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.innova.restaurant.dto.CreateUserDto;
+import com.innova.restaurant.dto.UpdateUserDto;
+import com.innova.restaurant.dto.UserDto;
+import com.innova.restaurant.model.enums.UserRole;
 
 /**
  * Interfaz de servicio para operaciones de usuario
@@ -128,4 +128,18 @@ public interface UserService {
      * @return cantidad de usuarios con el rol especificado
      */
     long countUsersByRole(UserRole role);
+
+    /**
+     * Búsqueda avanzada de usuarios con múltiples criterios opcionales
+     *
+     * @param firstName término de búsqueda para el nombre (opcional)
+     * @param lastName término de búsqueda para el apellido (opcional)
+     * @param email término de búsqueda para el email (opcional)
+     * @param username término de búsqueda para el username (opcional)
+     * @param role rol del usuario (opcional)
+     * @param isActive estado activo del usuario (opcional)
+     * @return lista de usuarios que cumplen los criterios
+     */
+    List<UserDto> searchUsers(String firstName, String lastName, String email, 
+                             String username, UserRole role, Boolean isActive);
 }

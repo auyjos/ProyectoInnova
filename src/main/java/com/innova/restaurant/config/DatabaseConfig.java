@@ -2,7 +2,6 @@ package com.innova.restaurant.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 /**
  * Configuración de base de datos para la aplicación

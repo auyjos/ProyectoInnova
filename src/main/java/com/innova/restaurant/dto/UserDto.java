@@ -1,8 +1,8 @@
 package com.innova.restaurant.dto;
 
-import com.innova.restaurant.model.enums.UserRole;
-
 import java.time.LocalDateTime;
+
+import com.innova.restaurant.model.enums.UserRole;
 
 /**
  * DTO para transferir datos de usuario

@@ -58,6 +58,12 @@
             <scope>runtime</scope>
         </dependency>
         
+        <!-- HikariCP Connection Pool -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+        
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -79,6 +85,13 @@
             <scope>runtime</scope>
         </dependency>
         
+        <!-- Environment Variables -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        
         <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -95,13 +108,14 @@
         <dependency>
             <groupId>de.flapdoodle.embed</groupId>
             <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <version>4.9.2</version>
             <scope>test</scope>
         </dependency>
         
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
         
         <!-- Documentation -->

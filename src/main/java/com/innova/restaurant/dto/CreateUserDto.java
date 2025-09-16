@@ -1,6 +1,7 @@
 package com.innova.restaurant.dto;
 
 import com.innova.restaurant.model.enums.UserRole;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

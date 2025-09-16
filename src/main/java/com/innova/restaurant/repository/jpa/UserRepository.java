@@ -1,20 +1,20 @@
 package com.innova.restaurant.repository.jpa;
 
-import com.innova.restaurant.model.entity.User;
-import com.innova.restaurant.model.enums.UserRole;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+import com.innova.restaurant.model.entity.User;
+import com.innova.restaurant.model.enums.UserRole;
 
 /**
  * Repositorio JPA para la entidad User
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
     /**
      * Busca un usuario por su email
@@ -91,13 +91,28 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countByRole(UserRole role);
 
     /**
-     * Busca usuarios por nombre o apellido usando LIKE
+     * Busca usuarios por nombre que contiene el término (ignora mayúsculas/minúsculas)
      *
-     * @param searchTerm término de búsqueda
+     * @param firstName término de búsqueda para el nombre
      * @return lista de usuarios que coinciden con la búsqueda
      */
-    @Query("SELECT u FROM User u WHERE " +
-           "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-           "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
-    List<User> findByNameContaining(@Param("searchTerm") String searchTerm);
+    List<User> findByFirstNameContainingIgnoreCase(String firstName);
+
+    /**
+     * Busca usuarios por apellido que contiene el término (ignora mayúsculas/minúsculas)
+     *
+     * @param lastName término de búsqueda para el apellido
+     * @return lista de usuarios que coinciden con la búsqueda
+     */
+    List<User> findByLastNameContainingIgnoreCase(String lastName);
+
+    /**
+     * Busca usuarios por nombre O apellido que contiene el término
+     *
+     * @param firstName término de búsqueda para el nombre
+     * @param lastName término de búsqueda para el apellido (mismo valor que firstName)
+     * @return lista de usuarios que coinciden con la búsqueda en nombre o apellido
+     */
+    List<User> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
+        String firstName, String lastName);
 }

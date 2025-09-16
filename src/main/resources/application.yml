@@ -1,106 +1,192 @@
 # =======================================================================
 # APPLICATION CONFIGURATION
 # =======================================================================
-spring.application.name=restaurant-reservation-platform
-spring.profiles.active=dev
+spring:
+  application:
+    name: restaurant-reservation-platform
+  profiles:
+    active: ${ACTIVE_PROFILE:postgres}
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
 
 # =======================================================================
 # SERVER CONFIGURATION
 # =======================================================================
-server.port=8080
-server.servlet.context-path=/api/v1
+server:
+  port: 8080
 
 # =======================================================================
 # LOGGING CONFIGURATION
 # =======================================================================
-logging.level.com.innova.restaurant=DEBUG
-logging.level.org.springframework.security=DEBUG
-logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+logging:
+  level:
+    com.innova.restaurant: DEBUG
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
 # =======================================================================
 # JWT CONFIGURATION
 # =======================================================================
-jwt.secret=mySecretKey123456789mySecretKey123456789mySecretKey123456789
-jwt.expiration=86400000
-
-# =======================================================================
-# VALIDATION CONFIGURATION
-# =======================================================================
-spring.jackson.serialization.fail-on-empty-beans=false
+jwt:
+  secret: mySecretKey123456789mySecretKey123456789mySecretKey123456789
+  expiration: 86400000
 
 ---
 # =======================================================================
 # DEVELOPMENT PROFILE
 # =======================================================================
-spring.config.activate.on-profile=dev
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/restaurant_db
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: restaurant_db
 
 # Database Selection (jpa or mongo)
-app.database.type=jpa
-
-# PostgreSQL Configuration
-spring.datasource.url=jdbc:postgresql://localhost:5432/restaurant_db
-spring.datasource.username=postgres
-spring.datasource.password=password
-spring.datasource.driver-class-name=org.postgresql.Driver
-
-# JPA Configuration
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-spring.jpa.properties.hibernate.format_sql=true
-
-# MongoDB Configuration
-spring.data.mongodb.host=localhost
-spring.data.mongodb.port=27017
-spring.data.mongodb.database=restaurant_db
+app:
+  database:
+    type: jpa
 
 ---
 # =======================================================================
 # PRODUCTION PROFILE
 # =======================================================================
-spring.config.activate.on-profile=prod
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/restaurant_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://localhost:27017/restaurant_db}
 
 # Database Selection (jpa or mongo)
-app.database.type=jpa
-
-# PostgreSQL Configuration
-spring.datasource.url=${DB_URL:jdbc:postgresql://localhost:5432/restaurant_db}
-spring.datasource.username=${DB_USERNAME:postgres}
-spring.datasource.password=${DB_PASSWORD:password}
-
-# JPA Configuration
-spring.jpa.hibernate.ddl-auto=validate
-spring.jpa.show-sql=false
-
-# MongoDB Configuration
-spring.data.mongodb.uri=${MONGO_URI:mongodb://localhost:27017/restaurant_db}
+app:
+  database:
+    type: jpa
 
 # Logging
-logging.level.com.innova.restaurant=INFO
-logging.level.org.springframework.security=WARN
+logging:
+  level:
+    com.innova.restaurant: INFO
+    org.springframework.security: WARN
 
 ---
 # =======================================================================
 # TEST PROFILE
 # =======================================================================
-spring.config.activate.on-profile=test
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  data:
+    mongodb:
+      database: test_restaurant_db
 
 # Database Selection
-app.database.type=jpa
-
-# H2 Database for Testing
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driver-class-name=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-
-# JPA Configuration
-spring.jpa.hibernate.ddl-auto=create-drop
-spring.jpa.show-sql=true
-
-# Embedded MongoDB for Testing
-spring.data.mongodb.database=test_restaurant_db
+app:
+  database:
+    type: jpa
 
 # JWT for Testing
-jwt.secret=testSecretKey123456789testSecretKey123456789testSecretKey123456789
-jwt.expiration=3600000
+jwt:
+  secret: testSecretKey123456789testSecretKey123456789testSecretKey123456789
+  expiration: 3600000
+
+---
+# =======================================================================
+# POSTGRES PROFILE
+# =======================================================================
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/restaurant_db}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+# Database Selection
+app:
+  database:
+    type: jpa
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:defaultSecretKey123456789defaultSecretKey123456789}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+---
+# =======================================================================
+# MONGO PROFILE
+# =======================================================================
+spring:
+  config:
+    activate:
+      on-profile: mongo
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/restaurant_db}
+  # Configurar un datasource en memoria para JPA cuando usamos MongoDB
+  datasource:
+    url: jdbc:h2:mem:mongoMode
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+# Database Selection
+app:
+  database:
+    type: mongo
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:defaultSecretKey123456789defaultSecretKey123456789}
+  expiration: ${JWT_EXPIRATION:86400000}

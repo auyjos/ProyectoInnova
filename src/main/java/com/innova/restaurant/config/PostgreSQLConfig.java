@@ -1,20 +1,23 @@
 package com.innova.restaurant.config;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 
-import javax.sql.DataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * Configuración de PostgreSQL con HikariCP para optimización de conexiones
  */
 @Configuration
-@ConditionalOnProperty(name = "app.database.type", havingValue = "jpa", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.database.type", havingValue = "jpa")
+@Profile({"postgres", "dev", "prod"})
 public class PostgreSQLConfig {
 
     @Value("${spring.datasource.url}")

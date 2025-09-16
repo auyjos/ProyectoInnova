@@ -1,13 +1,27 @@
 package com.innova.restaurant.model.entity;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+
 import com.innova.restaurant.model.enums.ReservationStatus;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
 
 /**
  * Entidad JPA para reservas
