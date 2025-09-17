@@ -1,0 +1,673 @@
+{
+  "info": {
+    "name": "Restaurant Reservation Platform API",
+    "description": "Colección completa de endpoints para la aplicación de reservas de restaurantes con arquitectura híbrida PostgreSQL + MongoDB.\n\n## Configuración inicial:\n1. Ejecutar 'Register Restaurant Owner' para crear un propietario\n2. Ejecutar 'Login' para obtener token JWT\n3. Ejecutar 'Create Restaurant' para crear un restaurante\n\n## Roles disponibles:\n- CUSTOMER: Cliente que puede hacer reservas\n- RESTAURANT_OWNER: Propietario que puede gestionar restaurantes\n- ADMIN: Administrador del sistema\n\n## Endpoints principales:\n- /api/auth/* - Autenticación y autorización\n- /api/restaurants - Gestión de restaurantes (CRUD)\n- /api/reservations - Gestión de reservas (requiere auth)\n- /api/hybrid/* - Endpoints que combinan PostgreSQL + MongoDB\n- /api/users - Gestión de usuarios (requiere roles específicos)",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Register Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testcustomer\",\n  \"email\": \"customer@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"Customer\",\n  \"phone\": \"+1234567890\",\n  \"role\": \"CUSTOMER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Restaurant Owner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has access token', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('accessToken');",
+                  "    pm.expect(response).to.have.property('user');",
+                  "    pm.expect(response.user.role).to.eql('RESTAURANT_OWNER');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"restaurantowner\",\n  \"email\": \"owner@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Restaurant\",\n  \"lastName\": \"Owner\",\n  \"phone\": \"+1234567891\",\n  \"role\": \"RESTAURANT_OWNER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"System\",\n  \"lastName\": \"Admin\",\n  \"phone\": \"+1234567892\",\n  \"role\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('jwt_token', response.accessToken);",
+                  "    console.log('JWT Token saved: ' + response.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"restaurantowner\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"YOUR_REFRESH_TOKEN\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "refresh"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🏪 Restaurants",
+      "item": [
+        {
+          "name": "Get All Restaurants (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has pagination structure', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('content');",
+                  "    pm.expect(response).to.have.property('pageable');",
+                  "    pm.expect(response).to.have.property('totalElements');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/restaurants?page=0&size=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Restaurant by ID",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Restaurants",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/restaurants?name=test",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "test",
+                  "description": "Filter by restaurant name (contains)"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Restaurant (Owner Only)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has restaurant data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('name');",
+                  "    pm.expect(response).to.have.property('owner');",
+                  "    pm.expect(response.owner.role).to.eql('RESTAURANT_OWNER');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mi Restaurante Test\",\n  \"description\": \"Un restaurante de prueba para validar el API\",\n  \"address\": \"123 Calle Principal, Ciudad Test\",\n  \"phone\": \"555-0123\",\n  \"email\": \"info@mirestaurante.com\",\n  \"openingTime\": \"09:00\",\n  \"closingTime\": \"22:00\",\n  \"maxCapacity\": 100,\n  \"ownerId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/restaurants",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Restaurant",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Restaurante Test Actualizado\",\n  \"description\": \"Descripción actualizada\",\n  \"address\": \"456 Nueva Dirección\",\n  \"phone\": \"555-9999\",\n  \"email\": \"nuevo@mirestaurante.com\",\n  \"openingTime\": \"08:00\",\n  \"closingTime\": \"23:00\",\n  \"maxCapacity\": 120\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📅 Reservations",
+      "item": [
+        {
+          "name": "Get My Reservations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservations?page=0&size=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reservation by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservations/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Reservation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 5,\n  \"restaurantId\": 1,\n  \"tableId\": 1,\n  \"reservationDateTime\": \"2025-12-20T19:30:00\",\n  \"numberOfGuests\": 4,\n  \"specialRequests\": \"Mesa cerca de la ventana\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reservations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Reservation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reservationDate\": \"2025-09-17T20:00:00\",\n  \"numberOfPeople\": 6,\n  \"specialRequests\": \"Mesa para celebración\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reservations/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Reservation Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CONFIRMED\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reservations/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations", "1", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm Reservation",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservations/1/confirm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations", "1", "confirm"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check-in Reservation",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservations/1/checkin",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations", "1", "checkin"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Reservation",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservations/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔗 Hybrid Endpoints",
+      "item": [
+        {
+          "name": "Get Hybrid Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hybrid/analytics/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hybrid", "analytics", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search with Hybrid Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hybrid/search?query=restaurant",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hybrid", "search"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "restaurant"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "👥 Users Management",
+      "item": [
+        {
+          "name": "Get All Users (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"newuser\",\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"New\",\n  \"lastName\": \"User\",\n  \"phone\": \"+1234567893\",\n  \"role\": \"CUSTOMER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🏥 Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/actuator/health",
+              "host": ["{{base_url}}"],
+              "path": ["actuator", "health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

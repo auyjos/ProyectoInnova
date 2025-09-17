@@ -1,19 +1,28 @@
 package com.innova.restaurant.controller;
 
-import com.innova.restaurant.model.enums.UserRole;
-import com.innova.restaurant.service.UserService;
-import com.innova.restaurant.dto.UserDto;
-import com.innova.restaurant.dto.CreateUserDto;
-import com.innova.restaurant.dto.UpdateUserDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.innova.restaurant.dto.CreateUserDto;
+import com.innova.restaurant.dto.UpdateUserDto;
+import com.innova.restaurant.dto.UserDto;
+import com.innova.restaurant.model.enums.UserRole;
+import com.innova.restaurant.service.UserService;
+
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired

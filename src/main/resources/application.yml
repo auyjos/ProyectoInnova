@@ -5,7 +5,7 @@ spring:
   application:
     name: restaurant-reservation-platform
   profiles:
-    active: ${ACTIVE_PROFILE:postgres}
+    active: ${ACTIVE_PROFILE:hybrid}
   jackson:
     serialization:
       fail-on-empty-beans: false
@@ -190,3 +190,48 @@ app:
 jwt:
   secret: ${JWT_SECRET:defaultSecretKey123456789defaultSecretKey123456789}
   expiration: ${JWT_EXPIRATION:86400000}
+
+---
+# =======================================================================
+# HYBRID PROFILE (PostgreSQL + MongoDB)
+# =======================================================================
+spring:
+  config:
+    activate:
+      on-profile: hybrid
+  # PostgreSQL Configuration
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/restaurant_reservation_db}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  # MongoDB Configuration
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/restaurant_reservation_mongo}
+
+# Database Selection - Hybrid mode uses both
+app:
+  database:
+    type: hybrid
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:mySecretKey}
+  expiration: ${JWT_EXPIRATION:86400000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+
+# Logging for Hybrid Mode
+logging:
+  level:
+    com.innova.restaurant: DEBUG
+    org.springframework.data.mongodb: INFO
+    org.springframework.data.jpa: INFO
