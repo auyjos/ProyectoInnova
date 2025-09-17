@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  */
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "com.innova.restaurant.repository.jpa")
-@EnableMongoRepositories(basePackages = "com.innova.restaurant.repository.mongo")
+@EnableMongoRepositories(basePackages = "com.innova.restaurant.repository.document")
 public class RestaurantReservationPlatformApplication {
 
     public static void main(String[] args) {

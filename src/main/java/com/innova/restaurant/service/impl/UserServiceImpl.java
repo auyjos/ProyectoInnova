@@ -21,7 +21,7 @@ import com.innova.restaurant.model.entity.User;
 import com.innova.restaurant.model.enums.UserRole;
 import com.innova.restaurant.repository.jpa.UserRepository;
 import com.innova.restaurant.repository.jpa.UserSpecifications;
-import com.innova.restaurant.repository.mongo.UserDocumentRepository;
+import com.innova.restaurant.repository.document.UserDocumentRepository;
 import com.innova.restaurant.service.UserService;
 
 /**
