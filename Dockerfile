@@ -1,9 +1,10 @@
 # Usar OpenJDK 17 como base
 FROM openjdk:17-jdk-slim
 
-# Instalar herramientas necesarias
+# Instalar Maven y herramientas necesarias
 RUN apt-get update && apt-get install -y \
     curl \
+    maven \
     && rm -rf /var/lib/apt/lists/*
 
 # Crear directorio de trabajo
@@ -11,20 +12,15 @@ WORKDIR /app
 
 # Copiar archivos Maven
 COPY pom.xml .
-COPY .mvn .mvn
-COPY mvnw .
-
-# Dar permisos de ejecución
-RUN chmod +x mvnw
 
 # Descargar dependencias (para cachear)
-RUN ./mvnw dependency:go-offline -B
+RUN mvn dependency:go-offline -B
 
 # Copiar código fuente
 COPY src ./src
 
 # Construir la aplicación
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # Exponer puerto
 EXPOSE 8080
