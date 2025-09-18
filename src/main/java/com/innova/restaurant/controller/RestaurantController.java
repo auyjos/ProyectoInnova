@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,17 +20,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.innova.restaurant.dto.RestaurantWithReviewsDto;
 import com.innova.restaurant.model.entity.Restaurant;
 import com.innova.restaurant.service.RestaurantService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 /**
  * Controlador REST para gestión de restaurantes
  * Cumple con el modelo de madurez Richardson Nivel 2
+ * Incluye integración con reviews de MongoDB
  */
 @RestController
 @RequestMapping("/api/restaurants")
+@Tag(name = "Restaurants", description = "Gestión de restaurantes con reviews integrados")
 public class RestaurantController {
 
     @Autowired
@@ -122,6 +131,64 @@ public class RestaurantController {
             @PathVariable Long id, 
             @RequestParam boolean active) {
         Restaurant restaurant = restaurantService.updateStatus(id, active);
+        return ResponseEntity.ok(restaurant);
+    }
+
+    // ===== NUEVOS ENDPOINTS CON REVIEWS INTEGRADOS =====
+
+    /**
+     * GET /api/restaurants/with-reviews - Obtener todos los restaurantes con sus reviews
+     */
+    @GetMapping("/with-reviews")
+    @Operation(summary = "Obtener restaurantes con reviews", 
+               description = "Obtiene todos los restaurantes con sus reviews de MongoDB integrados")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Restaurantes obtenidos exitosamente")
+    })
+    public ResponseEntity<Page<RestaurantWithReviewsDto>> getAllRestaurantsWithReviews(
+            @Parameter(description = "Paginación para restaurantes") Pageable restaurantsPageable,
+            @RequestParam(defaultValue = "0") @Parameter(description = "Página de reviews") int reviewsPage,
+            @RequestParam(defaultValue = "5") @Parameter(description = "Tamaño de página de reviews") int reviewsSize) {
+        
+        Pageable reviewsPageable = PageRequest.of(reviewsPage, reviewsSize);
+        Page<RestaurantWithReviewsDto> restaurants = restaurantService.findAllRestaurantsWithReviews(
+            restaurantsPageable, reviewsPageable);
+        return ResponseEntity.ok(restaurants);
+    }
+
+    /**
+     * GET /api/restaurants/{id}/with-reviews - Obtener restaurante específico con reviews paginados
+     */
+    @GetMapping("/{id}/with-reviews")
+    @Operation(summary = "Obtener restaurante con reviews paginados", 
+               description = "Obtiene un restaurante específico con sus reviews de MongoDB paginados")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Restaurante obtenido exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Restaurante no encontrado")
+    })
+    public ResponseEntity<RestaurantWithReviewsDto> getRestaurantWithReviews(
+            @PathVariable @Parameter(description = "ID del restaurante") Long id,
+            @Parameter(description = "Paginación para reviews") Pageable reviewsPageable) {
+        
+        RestaurantWithReviewsDto restaurant = restaurantService.findRestaurantWithReviews(id, reviewsPageable);
+        return ResponseEntity.ok(restaurant);
+    }
+
+    /**
+     * GET /api/restaurants/{id}/with-recent-reviews - Obtener restaurante con reviews recientes
+     */
+    @GetMapping("/{id}/with-recent-reviews")
+    @Operation(summary = "Obtener restaurante con reviews recientes", 
+               description = "Obtiene un restaurante con sus reviews más recientes (sin paginación)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Restaurante obtenido exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Restaurante no encontrado")
+    })
+    public ResponseEntity<RestaurantWithReviewsDto> getRestaurantWithRecentReviews(
+            @PathVariable @Parameter(description = "ID del restaurante") Long id,
+            @RequestParam(defaultValue = "10") @Parameter(description = "Número de reviews recientes") int limit) {
+        
+        RestaurantWithReviewsDto restaurant = restaurantService.findRestaurantWithRecentReviews(id, limit);
         return ResponseEntity.ok(restaurant);
     }
 

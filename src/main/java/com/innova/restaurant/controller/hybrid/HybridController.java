@@ -3,6 +3,9 @@ package com.innova.restaurant.controller.hybrid;
 import com.innova.restaurant.model.document.ReviewDocument;
 import com.innova.restaurant.model.document.UserActivityDocument;
 import com.innova.restaurant.service.hybrid.HybridReviewService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +19,11 @@ import java.util.Map;
 /**
  * Controlador que demuestra la arquitectura híbrida PostgreSQL + MongoDB
  * Sin uso de @Query - solo query methods automáticos
+ * NOTA: Algunos endpoints están deprecados en favor de endpoints integrados en RestaurantController
  */
 @RestController
 @RequestMapping("/api/hybrid")
+@Tag(name = "Hybrid API (Legacy)", description = "Endpoints híbridos - algunos deprecados en favor de endpoints integrados")
 public class HybridController {
 
     @Autowired
@@ -43,8 +48,14 @@ public class HybridController {
 
     /**
      * Obtener reviews de un restaurante con paginación
+     * @deprecated Usar /api/restaurants/{id}/with-reviews en su lugar
      */
     @GetMapping("/restaurants/{restaurantId}/reviews")
+    @Deprecated
+    @Operation(summary = "[DEPRECATED] Obtener reviews de restaurante", 
+               description = "DEPRECADO: Usar /api/restaurants/{id}/with-reviews para funcionalidad integrada",
+               deprecated = true)
+    @ApiResponse(responseCode = "200", description = "Usar endpoint integrado en su lugar")
     public ResponseEntity<Page<ReviewDocument>> getRestaurantReviews(
             @PathVariable Long restaurantId,
             Pageable pageable) {
@@ -92,8 +103,14 @@ public class HybridController {
 
     /**
      * Obtener estadísticas híbridas de un restaurante
+     * @deprecated Las estadísticas ahora están incluidas en /api/restaurants/{id}/with-reviews
      */
     @GetMapping("/restaurants/{restaurantId}/statistics")
+    @Deprecated
+    @Operation(summary = "[DEPRECATED] Obtener estadísticas de restaurante", 
+               description = "DEPRECADO: Las estadísticas están incluidas en /api/restaurants/{id}/with-reviews",
+               deprecated = true)
+    @ApiResponse(responseCode = "200", description = "Usar endpoint integrado en su lugar")
     public ResponseEntity<Map<String, Object>> getRestaurantStatistics(@PathVariable Long restaurantId) {
         
         Map<String, Object> statistics = hybridReviewService.getRestaurantStatistics(restaurantId);
@@ -102,8 +119,14 @@ public class HybridController {
 
     /**
      * Obtener reviews recientes de un restaurante
+     * @deprecated Usar /api/restaurants/{id}/with-recent-reviews en su lugar
      */
     @GetMapping("/restaurants/{restaurantId}/reviews/recent")
+    @Deprecated
+    @Operation(summary = "[DEPRECATED] Obtener reviews recientes", 
+               description = "DEPRECADO: Usar /api/restaurants/{id}/with-recent-reviews para funcionalidad integrada",
+               deprecated = true)
+    @ApiResponse(responseCode = "200", description = "Usar endpoint integrado en su lugar")
     public ResponseEntity<List<ReviewDocument>> getRecentReviews(
             @PathVariable Long restaurantId,
             @RequestParam(defaultValue = "10") int limit) {

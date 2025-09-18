@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.innova.restaurant.controller.RestaurantController;
+import com.innova.restaurant.dto.RestaurantWithReviewsDto;
 import com.innova.restaurant.model.entity.Restaurant;
 
 /**
@@ -57,4 +58,19 @@ public interface RestaurantService {
      * Actualiza el estado activo/inactivo de un restaurante
      */
     Restaurant updateStatus(Long id, boolean active);
+
+    /**
+     * Encuentra un restaurante por ID con sus reviews integrados
+     */
+    RestaurantWithReviewsDto findRestaurantWithReviews(Long id, Pageable reviewsPageable);
+
+    /**
+     * Encuentra todos los restaurantes con sus reviews integrados
+     */
+    Page<RestaurantWithReviewsDto> findAllRestaurantsWithReviews(Pageable restaurantsPageable, Pageable reviewsPageable);
+
+    /**
+     * Encuentra un restaurante con sus reviews más recientes (sin paginación)
+     */
+    RestaurantWithReviewsDto findRestaurantWithRecentReviews(Long id, int reviewLimit);
 }
