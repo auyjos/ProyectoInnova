@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Restaurant Reservation Platform API",
-    "description": "Colección completa de endpoints para la aplicación de reservas de restaurantes con arquitectura híbrida PostgreSQL + MongoDB.\n\n## Configuración inicial:\n1. Ejecutar 'Register Restaurant Owner' para crear un propietario\n2. Ejecutar 'Login' para obtener token JWT\n3. Ejecutar 'Create Restaurant' para crear un restaurante\n\n## Roles disponibles:\n- CUSTOMER: Cliente que puede hacer reservas\n- RESTAURANT_OWNER: Propietario que puede gestionar restaurantes\n- ADMIN: Administrador del sistema\n\n## Endpoints principales:\n- /api/auth/* - Autenticación y autorización\n- /api/restaurants - Gestión de restaurantes (CRUD)\n- /api/reservations - Gestión de reservas (requiere auth)\n- /api/hybrid/* - Endpoints que combinan PostgreSQL + MongoDB\n- /api/users - Gestión de usuarios (requiere roles específicos)",
+    "description": "Colección completa de endpoints para la aplicación de reservas de restaurantes con arquitectura híbrida PostgreSQL + MongoDB.\n\n## ✅ ACTUALIZADO - Gestión completa de mesas y reservaciones:\n- Nuevos endpoints para gestión de mesas de restaurantes\n- Campo `numberOfPeople` corregido (antes `numberOfGuests`)\n- Validaciones de capacidad de mesa implementadas\n- Endpoints de prueba para validación de errores\n- DTOs con Bean Validation para mayor robustez\n\n## Configuración inicial:\n1. Ejecutar 'Register Restaurant Owner' para crear un propietario\n2. Ejecutar 'Login' para obtener token JWT\n3. Ejecutar 'Create Restaurant' para crear un restaurante\n4. Ejecutar 'Create Table' para agregar mesas (o usar insert_tables.sql)\n\n## Roles disponibles:\n- CUSTOMER: Cliente que puede hacer reservas\n- RESTAURANT_OWNER: Propietario que puede gestionar restaurantes y mesas\n- ADMIN: Administrador del sistema\n\n## Endpoints principales:\n- /api/auth/* - Autenticación y autorización\n- /api/restaurants - Gestión de restaurantes (CRUD)\n- /api/restaurants/{id}/tables - **NUEVO** Gestión de mesas por restaurante\n- /api/reservations - Gestión de reservas (requiere auth)\n- /api/hybrid/* - Endpoints que combinan PostgreSQL + MongoDB\n- /api/users - Gestión de usuarios (requiere roles específicos)\n\n## Estados de reserva disponibles:\n- PENDING: Reserva creada, pendiente de confirmación\n- CONFIRMED: Reserva confirmada por el restaurante\n- CANCELLED: Reserva cancelada\n- COMPLETED: Cliente hizo check-in\n- NO_SHOW: Cliente no se presentó",
     "version": "1.0.0",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -353,6 +353,258 @@
       ]
     },
     {
+      "name": "🪑 Restaurant Tables",
+      "item": [
+        {
+          "name": "Get All Tables for Restaurant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/1/tables",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants", "1", "tables"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Table by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/1/tables/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants", "1", "tables", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Table",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has table data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('tableNumber');",
+                  "    pm.expect(response).to.have.property('capacity');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tableNumber\": 10,\n  \"capacity\": 4,\n  \"status\": \"AVAILABLE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/1/tables",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants", "1", "tables"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Table",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tableNumber\": 11,\n  \"capacity\": 6,\n  \"status\": \"OCCUPIED\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/1/tables/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants", "1", "tables", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Available Tables",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/1/tables/available",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants", "1", "tables", "available"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Table",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/1/tables/10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants", "1", "tables", "10"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Table - Validation Error (Duplicate Number)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 or 409', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 409]);",
+                  "});",
+                  "",
+                  "pm.test('Response has error message', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tableNumber\": 1,\n  \"capacity\": 4,\n  \"status\": \"AVAILABLE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/1/tables",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants", "1", "tables"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Table - Validation Error (Invalid Capacity)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response has validation error', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tableNumber\": 99,\n  \"capacity\": 0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/1/tables",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurants", "1", "tables"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "📅 Reservations",
       "item": [
         {
@@ -417,7 +669,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": 5,\n  \"restaurantId\": 1,\n  \"tableId\": 1,\n  \"reservationDateTime\": \"2025-12-20T19:30:00\",\n  \"numberOfGuests\": 4,\n  \"specialRequests\": \"Mesa cerca de la ventana\"\n}"
+              "raw": "{\n  \"userId\": 1,\n  \"restaurantId\": 1,\n  \"tableId\": 1,\n  \"reservationDateTime\": \"2025-12-20T19:30:00\",\n  \"numberOfPeople\": 4,\n  \"specialRequests\": \"Mesa cerca de la ventana\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/reservations",
@@ -443,7 +695,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"reservationDate\": \"2025-09-17T20:00:00\",\n  \"numberOfPeople\": 6,\n  \"specialRequests\": \"Mesa para celebración\"\n}"
+              "raw": "{\n  \"reservationDateTime\": \"2025-12-20T20:00:00\",\n  \"numberOfPeople\": 6,\n  \"specialRequests\": \"Mesa para celebración\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/reservations/1",
@@ -459,22 +711,20 @@
             "method": "PATCH",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{jwt_token}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"CONFIRMED\"\n}"
-            },
             "url": {
-              "raw": "{{base_url}}/api/reservations/1/status",
+              "raw": "{{base_url}}/api/reservations/1/status?status=CONFIRMED",
               "host": ["{{base_url}}"],
-              "path": ["api", "reservations", "1", "status"]
+              "path": ["api", "reservations", "1", "status"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "CONFIRMED"
+                }
+              ]
             }
           },
           "response": []
@@ -482,7 +732,7 @@
         {
           "name": "Confirm Reservation",
           "request": {
-            "method": "PATCH",
+            "method": "POST",
             "header": [
               {
                 "key": "Authorization",
@@ -500,7 +750,7 @@
         {
           "name": "Check-in Reservation",
           "request": {
-            "method": "PATCH",
+            "method": "POST",
             "header": [
               {
                 "key": "Authorization",
@@ -529,6 +779,145 @@
               "raw": "{{base_url}}/api/reservations/1",
               "host": ["{{base_url}}"],
               "path": ["api", "reservations", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reservations by User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservations/user/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations", "user", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reservations by Restaurant",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservations/restaurant/1?status=PENDING",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations", "restaurant", "1"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING",
+                  "description": "Optional: Filter by status (PENDING, CONFIRMED, CANCELLED, COMPLETED, NO_SHOW)"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Today's Reservations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservations/today/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations", "today", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "❌ Test: Create Reservation - Over Capacity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"restaurantId\": 1,\n  \"tableId\": 2,\n  \"reservationDateTime\": \"2025-12-20T20:00:00\",\n  \"numberOfPeople\": 5,\n  \"specialRequests\": \"Test validation - should fail, table capacity is only 2\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reservations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "❌ Test: Create Reservation - Past Date",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"restaurantId\": 1,\n  \"tableId\": 1,\n  \"reservationDateTime\": \"2024-12-20T19:30:00\",\n  \"numberOfPeople\": 4,\n  \"specialRequests\": \"Test validation - should fail, date in past\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reservations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "❌ Test: Create Reservation - Invalid Table",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"restaurantId\": 1,\n  \"tableId\": 999,\n  \"reservationDateTime\": \"2025-12-20T19:30:00\",\n  \"numberOfPeople\": 4,\n  \"specialRequests\": \"Test validation - should fail, table doesn't exist\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reservations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations"]
             }
           },
           "response": []

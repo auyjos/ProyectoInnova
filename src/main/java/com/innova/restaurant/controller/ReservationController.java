@@ -23,6 +23,9 @@ import com.innova.restaurant.model.entity.Reservation;
 import com.innova.restaurant.service.ReservationService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Controlador REST para gestión de reservaciones
@@ -157,11 +160,23 @@ public class ReservationController {
 
     // DTOs para requests
     public static class CreateReservationRequest {
+        @NotNull(message = "El ID del usuario es obligatorio")
         private Long userId;
+        
+        @NotNull(message = "El ID del restaurante es obligatorio")
         private Long restaurantId;
+        
+        @NotNull(message = "El ID de la mesa es obligatorio")
         private Long tableId;
+        
+        @NotNull(message = "La fecha de reserva es obligatoria")
+        @Future(message = "La fecha de reserva debe ser futura")
         private LocalDateTime reservationDateTime;
-        private Integer numberOfGuests;
+        
+        @NotNull(message = "El número de personas es obligatorio")
+        @Min(value = 1, message = "El número de personas debe ser mayor a 0")
+        private Integer numberOfPeople;
+        
         private String specialRequests;
 
         // Getters y Setters
@@ -177,8 +192,8 @@ public class ReservationController {
         public LocalDateTime getReservationDateTime() { return reservationDateTime; }
         public void setReservationDateTime(LocalDateTime reservationDateTime) { this.reservationDateTime = reservationDateTime; }
 
-        public Integer getNumberOfGuests() { return numberOfGuests; }
-        public void setNumberOfGuests(Integer numberOfGuests) { this.numberOfGuests = numberOfGuests; }
+        public Integer getNumberOfPeople() { return numberOfPeople; }
+        public void setNumberOfPeople(Integer numberOfPeople) { this.numberOfPeople = numberOfPeople; }
 
         public String getSpecialRequests() { return specialRequests; }
         public void setSpecialRequests(String specialRequests) { this.specialRequests = specialRequests; }
@@ -186,15 +201,15 @@ public class ReservationController {
 
     public static class UpdateReservationRequest {
         private LocalDateTime reservationDateTime;
-        private Integer numberOfGuests;
+        private Integer numberOfPeople;
         private String specialRequests;
 
         // Getters y Setters
         public LocalDateTime getReservationDateTime() { return reservationDateTime; }
         public void setReservationDateTime(LocalDateTime reservationDateTime) { this.reservationDateTime = reservationDateTime; }
 
-        public Integer getNumberOfGuests() { return numberOfGuests; }
-        public void setNumberOfGuests(Integer numberOfGuests) { this.numberOfGuests = numberOfGuests; }
+        public Integer getNumberOfPeople() { return numberOfPeople; }
+        public void setNumberOfPeople(Integer numberOfPeople) { this.numberOfPeople = numberOfPeople; }
 
         public String getSpecialRequests() { return specialRequests; }
         public void setSpecialRequests(String specialRequests) { this.specialRequests = specialRequests; }

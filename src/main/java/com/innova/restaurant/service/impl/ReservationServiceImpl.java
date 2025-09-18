@@ -76,7 +76,7 @@ public class ReservationServiceImpl implements ReservationService {
         
         logger.debug("Request data: userId={}, restaurantId={}, tableId={}, dateTime={}, guests={}", 
                     request.getUserId(), request.getRestaurantId(), request.getTableId(), 
-                    request.getReservationDateTime(), request.getNumberOfGuests());
+                    request.getReservationDateTime(), request.getNumberOfPeople());
 
         // Validar que el restaurante existe y está activo
         logger.debug("Buscando restaurante con ID: {}", request.getRestaurantId());
@@ -100,6 +100,14 @@ public class ReservationServiceImpl implements ReservationService {
             .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
         logger.debug("Mesa encontrada: mesa #{}, capacidad: {}", table.getTableNumber(), table.getCapacity());
 
+        // Validar que el número de personas no exceda la capacidad de la mesa
+        if (request.getNumberOfPeople() > table.getCapacity()) {
+            throw new RuntimeException(
+                String.format("El número de personas (%d) excede la capacidad de la mesa (%d)", 
+                             request.getNumberOfPeople(), table.getCapacity())
+            );
+        }
+
         // Validar que la fecha de reserva es futura
         if (request.getReservationDateTime().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("No se pueden hacer reservas en el pasado");
@@ -121,7 +129,7 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservation = new Reservation(
             customer, restaurant, table, 
             request.getReservationDateTime(), 
-            request.getNumberOfGuests(),
+            request.getNumberOfPeople(),
             request.getSpecialRequests()
         );
         
@@ -155,8 +163,8 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         // Actualizar otros campos permitidos
-        if (request.getNumberOfGuests() != null) {
-            existingReservation.setNumberOfPeople(request.getNumberOfGuests());
+        if (request.getNumberOfPeople() != null) {
+            existingReservation.setNumberOfPeople(request.getNumberOfPeople());
         }
 
         if (request.getSpecialRequests() != null) {

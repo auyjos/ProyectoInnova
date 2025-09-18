@@ -142,19 +142,15 @@ public class SecurityConfig {
     }
 
     /**
-     * Configuración CORS para permitir peticiones desde frontend
-     * En producción se debe configurar con dominios específicos
+     * Configuración CORS para permitir peticiones desde cualquier origen
+     * Configuración permisiva para desarrollo y producción
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Permitir orígenes específicos (en desarrollo: localhost)
-        configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",   // React dev server
-            "http://localhost:4200",   // Angular dev server
-            "http://localhost:5173"    // Vite dev server
-        ));
+        // Permitir todos los orígenes (wildcard)
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         
         // Métodos HTTP permitidos
         configuration.setAllowedMethods(Arrays.asList(

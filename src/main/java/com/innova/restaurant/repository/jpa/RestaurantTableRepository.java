@@ -76,4 +76,39 @@ public interface RestaurantTableRepository extends JpaRepository<RestaurantTable
      * @return número de mesas con el estado especificado
      */
     long countByRestaurantIdAndStatus(Long restaurantId, TableStatus status);
+
+    /**
+     * Busca mesas por restaurante ordenadas por número de mesa
+     *
+     * @param restaurantId ID del restaurante
+     * @return lista de mesas ordenadas por número
+     */
+    List<RestaurantTable> findByRestaurantIdOrderByTableNumberAsc(Long restaurantId);
+
+    /**
+     * Busca mesas disponibles por restaurante ordenadas por número de mesa
+     *
+     * @param restaurantId ID del restaurante
+     * @param status estado de la mesa
+     * @return lista de mesas disponibles ordenadas por número
+     */
+    List<RestaurantTable> findByRestaurantIdAndStatusOrderByTableNumberAsc(Long restaurantId, TableStatus status);
+
+    /**
+     * Verifica si existe una mesa con número específico en un restaurante
+     *
+     * @param restaurantId ID del restaurante
+     * @param tableNumber número de mesa
+     * @return true si existe la mesa
+     */
+    boolean existsByRestaurantIdAndTableNumber(Long restaurantId, Integer tableNumber);
+
+    /**
+     * Verifica si existe una mesa por ID y restaurante
+     *
+     * @param tableId ID de la mesa
+     * @param restaurantId ID del restaurante
+     * @return true si existe la mesa en el restaurante
+     */
+    boolean existsByIdAndRestaurantId(Long tableId, Long restaurantId);
 }
