@@ -29,5 +29,15 @@ EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE=production
 ENV SERVER_PORT=8080
 
-# Comando para ejecutar la aplicación con configuración explícita
-CMD ["java", "-Dspring.profiles.active=production", "-Dserver.port=${PORT:-8080}", "-jar", "target/restaurant-reservation-platform-1.0.0-SNAPSHOT.jar"]
+# Comando para ejecutar la aplicación con configuración explícita y más logging
+CMD ["java", \
+     "-Dspring.profiles.active=production", \
+     "-Dserver.port=${PORT:-8080}", \
+     "-Dspring.datasource.url=${POSTGRES_URL}", \
+     "-Dspring.datasource.username=${POSTGRES_USER}", \
+     "-Dspring.datasource.password=${POSTGRES_PASSWORD}", \
+     "-Dspring.datasource.driver-class-name=org.postgresql.Driver", \
+     "-Dspring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect", \
+     "-Dspring.sql.init.mode=never", \
+     "-Dlogging.level.org.springframework.boot.autoconfigure=DEBUG", \
+     "-jar", "target/restaurant-reservation-platform-1.0.0-SNAPSHOT.jar"]
