@@ -1,36 +1,10 @@
-# Usar OpenJDK 17 como base
-FROM openjdk:17-jdk-slim
+# Approach súper simple: Solo ejecutar como lo hacemos aquí
+FROM maven:latest
 
-# Instalar Maven y herramientas necesarias
-RUN apt-get update && apt-get install -y \
-    curl \
-    maven \
-    && rm -rf /var/lib/apt/lists/*
-
-# Crear directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos Maven
-COPY pom.xml .
+# Copiar todo el proyecto
+COPY . .
 
-# Descargar dependencias (para cachear)
-RUN mvn dependency:go-offline -B
-
-# Copiar código fuente
-COPY src ./src
-
-# Construir la aplicación
-RUN mvn clean package -DskipTests
-
-# Exponer puerto
-EXPOSE 8080
-
-# Variables de entorno por defecto
-ENV SPRING_PROFILES_ACTIVE=production
-ENV SERVER_PORT=8080
-
-# Comando para ejecutar la aplicación con configuración Railway
-CMD ["java", \
-     "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", \
-     "-Dserver.port=${PORT:-8080}", \
-     "-jar", "target/restaurant-reservation-platform-1.0.0-SNAPSHOT.jar"]
+# Ejecutar exactamente como lo hacemos aquí: mvn spring-boot:run pero en Railway
+CMD ["mvn", "spring-boot:run", "-Dspring-boot.run.profiles=railway"]
