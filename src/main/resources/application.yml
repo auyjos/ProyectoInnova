@@ -5,7 +5,7 @@ spring:
   application:
     name: restaurant-reservation-platform
   profiles:
-    active: ${ACTIVE_PROFILE:hybrid}
+    active: ${ACTIVE_PROFILE:railway}
   jackson:
     serialization:
       fail-on-empty-beans: false
@@ -14,7 +14,7 @@ spring:
 # SERVER CONFIGURATION
 # =======================================================================
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 # =======================================================================
 # LOGGING CONFIGURATION
@@ -74,27 +74,123 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/restaurant_db}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:password}
+    url: ${DATABASE_URL:${DB_URL:jdbc:postgresql://localhost:5432/restaurant_db}}
+    username: ${POSTGRES_USER:${DB_USERNAME:postgres}}
+    password: ${POSTGRES_PASSWORD:${DB_PASSWORD:password}}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
   data:
     mongodb:
-      uri: ${MONGO_URI:mongodb://localhost:27017/restaurant_db}
+      uri: ${MONGODB_ATLAS_URI:${MONGO_URI:mongodb://localhost:27017/restaurant_db}}
 
-# Database Selection (jpa or mongo)
+# Database Selection - Hybrid mode for production
 app:
   database:
-    type: jpa
+    type: hybrid
 
-# Logging
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:defaultSecretKey123456789defaultSecretKey123456789}
+  expiration: ${JWT_EXPIRATION:86400000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+
+# Logging for Production
 logging:
   level:
     com.innova.restaurant: INFO
     org.springframework.security: WARN
+
+---
+# =======================================================================
+# PRODUCTION PROFILE (Alternative name for Railway)
+# =======================================================================
+spring:
+  config:
+    activate:
+      on-profile: production
+  datasource:
+    url: ${DATABASE_URL:${DB_URL:jdbc:postgresql://localhost:5432/restaurant_db}}
+    username: ${POSTGRES_USER:${DB_USERNAME:postgres}}
+    password: ${POSTGRES_PASSWORD:${DB_PASSWORD:password}}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+  data:
+    mongodb:
+      uri: ${MONGODB_ATLAS_URI:${MONGO_URI:mongodb://localhost:27017/restaurant_db}}
+
+# Database Selection - Hybrid mode for production
+app:
+  database:
+    type: hybrid
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:defaultSecretKey123456789defaultSecretKey123456789}
+  expiration: ${JWT_EXPIRATION:86400000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+
+# Logging for Production
+logging:
+  level:
+    com.innova.restaurant: INFO
+    org.springframework.security: WARN
+
+---
+# =======================================================================
+# RAILWAY PROFILE (GitHub-safe version)
+# =======================================================================
+spring:
+  config:
+    activate:
+      on-profile: railway
+  datasource:
+    url: ${DATABASE_URL:${RAILWAY_DB_URL:jdbc:postgresql://localhost:5432/restaurant_db}}
+    username: ${POSTGRES_USER:${RAILWAY_DB_USERNAME:postgres}}
+    password: ${POSTGRES_PASSWORD:${RAILWAY_DB_PASSWORD:password}}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+  data:
+    mongodb:
+      uri: ${MONGODB_ATLAS_URI:${MONGODB_URI:mongodb://localhost:27017/restaurant_db}}
+
+# Database Selection - Hybrid mode uses both
+app:
+  database:
+    type: hybrid
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:mySecretKey123456789mySecretKey123456789mySecretKey123456789}
+  expiration: ${JWT_EXPIRATION:86400000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+
+# Logging for Railway
+logging:
+  level:
+    com.innova.restaurant: INFO
+    org.springframework.data.mongodb: WARN
+    org.springframework.data.jpa: WARN
 
 ---
 # =======================================================================

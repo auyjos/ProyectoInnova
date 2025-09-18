@@ -3,20 +3,16 @@ package com.innova.restaurant.config;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 
 /**
  * Configuración de MongoDB
  */
 @Configuration
-@ConditionalOnProperty(name = "app.database.type", havingValue = "mongo")
-@Profile("mongo")
 public class MongoConfig extends AbstractMongoClientConfiguration {
 
-    @Value("${MONGODB_URI:mongodb://localhost:27017/restaurant_db}")
+    @Value("${MONGODB_ATLAS_URI:${MONGODB_URI:mongodb://localhost:27017/restaurant_db}}")
     private String mongoUri;
 
     @Override
