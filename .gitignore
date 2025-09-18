@@ -147,6 +147,8 @@ log/
 .env
 .env.local
 .env.*.local
+render-secrets.env
+*secrets*.env
 
 # =======================================================================
 # COVERAGE REPORTS

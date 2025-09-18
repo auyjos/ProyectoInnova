@@ -1,0 +1,16 @@
+target/
+.git/
+.github/
+*.md
+.env
+.vscode/
+*.log
+test-guide.sh
+init-test-data.sh
+RESERVATIONS_WORKING.md
+Restaurant_API_Collection.postman_collection.json
+.DS_Store
+*.tmp
+*.temp
+node_modules/
+.mvn/wrapper/maven-wrapper.jar
