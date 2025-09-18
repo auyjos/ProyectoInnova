@@ -1,11 +1,12 @@
 package com.innova.restaurant.dto;
 
-import com.innova.restaurant.model.entity.Restaurant;
-import com.innova.restaurant.model.document.ReviewDocument;
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.List;
 import java.util.Map;
+
+import com.innova.restaurant.model.document.ReviewDocument;
+import com.innova.restaurant.model.entity.Restaurant;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * DTO que combina información de Restaurant (PostgreSQL) con Reviews (MongoDB)
