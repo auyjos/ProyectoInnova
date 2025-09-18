@@ -29,5 +29,5 @@ EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE=production
 ENV SERVER_PORT=8080
 
-# Comando para ejecutar la aplicación
-CMD ["java", "-jar", "target/restaurant-reservation-platform-1.0.0-SNAPSHOT.jar"]
+# Comando para ejecutar la aplicación con configuración explícita
+CMD ["java", "-Dspring.profiles.active=production", "-Dserver.port=${PORT:-8080}", "-jar", "target/restaurant-reservation-platform-1.0.0-SNAPSHOT.jar"]
